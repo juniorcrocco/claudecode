@@ -1,2 +1,5 @@
 # Cloned third-party repository (has its own git history), used for local development
 remotion/
+
+# Locally downloaded chrome-headless-shell binary used to render videos in this environment
+.browser/

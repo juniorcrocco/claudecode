@@ -2,6 +2,7 @@ import { AbsoluteFill, Sequence } from 'remotion';
 import { scenes } from '../scenes';
 import { Scene } from './Scene';
 import { Soundtrack } from './Soundtrack';
+import { CinematicGrade } from './CinematicGrade';
 import { theme } from '../theme';
 
 export const LadyCoReel: React.FC = () => {
@@ -13,6 +14,8 @@ export const LadyCoReel: React.FC = () => {
           <Scene data={s} />
         </Sequence>
       ))}
+      {/* grade cinematográfico global por cima de tudo (cor, grão, vinheta, leak) */}
+      <CinematicGrade />
     </AbsoluteFill>
   );
 };

@@ -1,0 +1,8 @@
+node_modules/
+out/
+.browser/
+# Footage baixado do Drive — pesado, nao versionar.
+public/video/*
+public/audio/*
+!public/video/.gitkeep
+!public/audio/.gitkeep

@@ -1,0 +1,22 @@
+{
+  "name": "palestra-trailer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trailer cinematografico (nivel Hollywood) para abertura de palestras, montado em Remotion a partir dos clipes do Google Drive.",
+  "scripts": {
+    "fetch": "node scripts/fetch-drive.mjs",
+    "dev": "remotion studio",
+    "render": "remotion render PalestraTrailer out/trailer.mp4 --codec=h264 --crf=17",
+    "render:teaser": "remotion render Teaser out/teaser.mp4 --codec=h264 --crf=17"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "typescript": "^5.4.5"
+  }
+}

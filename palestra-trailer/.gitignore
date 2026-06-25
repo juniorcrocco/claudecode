@@ -1,0 +1,7 @@
+node_modules/
+out/
+downloads/
+posters/
+public/footage/*
+!public/footage/.gitkeep
+.DS_Store

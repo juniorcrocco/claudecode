@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChatFusion — Folder A4 (4 faces A5)</title>
+<style>
+  /* ============================================================
+     ChatFusion — Folder impresso
+     A4 horizontal, dobrado ao meio -> 4 faces A5
+     Sheet externo: Contracapa | Capa
+     Sheet interno:  Problemas   | Soluções   (+ faixa Disparos)
+     ============================================================ */
+
+  :root{
+    --ink:#0B1020;
+    --ink-2:#131A33;
+    --paper:#FBFCFE;
+    --paper-2:#F1F4FB;
+    --line:#E4E9F3;
+    --slate:#5A6786;
+    --slate-2:#8A96B4;
+    --text:#141A2E;
+
+    --core-a:#7C3AED;   /* violeta */
+    --core-b:#4F46E5;   /* indigo  */
+    --core-c:#2563EB;   /* azul    */
+    --wa:#25D366;       /* WhatsApp */
+    --wa-deep:#128C7E;
+    --meta:#0866FF;     /* Meta     */
+    --ig-1:#F58529; --ig-2:#DD2A7B; --ig-3:#8134AF; /* Instagram */
+
+    --grad-core:linear-gradient(135deg,var(--core-a),var(--core-c));
+    --grad-ig:linear-gradient(135deg,#FEDA75,var(--ig-1) 30%,var(--ig-2) 62%,var(--ig-3));
+    --grad-night:radial-gradient(120% 120% at 78% 8%,#1B2450 0%,#0B1020 55%);
+
+    --face-w:148mm; --face-h:210mm;
+    --pad:11mm;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--text);
+    background:#5b6480;
+    background:
+      radial-gradient(60% 80% at 50% -10%, #2a3252 0%, rgba(42,50,82,0) 60%),
+      #464e69;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    padding:26px 16px 60px;
+  }
+  @media (prefers-color-scheme:light){ body{ background:
+      radial-gradient(60% 80% at 50% -10%, #eef1f8 0%, rgba(238,241,248,0) 60%), #dfe3ee; } }
+  :root[data-theme="dark"] body{ background:radial-gradient(60% 80% at 50% -10%,#2a3252 0%,rgba(42,50,82,0) 60%),#464e69; }
+  :root[data-theme="light"] body{ background:radial-gradient(60% 80% at 50% -10%,#eef1f8 0%,rgba(238,241,248,0) 60%),#dfe3ee; }
+
+  .doc{max-width:1180px;margin:0 auto}
+  .doc-head{color:#eef1fb;text-align:center;margin:4px auto 30px;max-width:820px}
+  :root[data-theme="light"] .doc-head,
+  @media (prefers-color-scheme:light){ }
+  .doc-head h1{font-size:20px;letter-spacing:.02em;margin:0 0 6px;font-weight:800}
+  .doc-head p{margin:0;font-size:13.5px;color:#c7cee4;line-height:1.55}
+  @media (prefers-color-scheme:light){ .doc-head{color:#1b2138} .doc-head p{color:#4a5372} }
+  :root[data-theme="light"] .doc-head{color:#1b2138}
+  :root[data-theme="light"] .doc-head p{color:#4a5372}
+
+  .sheet-wrap{margin:0 0 34px}
+  .sheet-label{
+    display:flex;align-items:center;gap:10px;justify-content:center;
+    color:#d7ddf0;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:700;
+    margin:0 0 12px}
+  .sheet-label span{opacity:.55;letter-spacing:.14em}
+  @media (prefers-color-scheme:light){ .sheet-label{color:#404a68} }
+  :root[data-theme="light"] .sheet-label{color:#404a68}
+
+  /* --- the physical sheet: A4 landscape = two A5 faces --- */
+  .sheet{
+    width:calc(var(--face-w) * 2);
+    height:var(--face-h);
+    margin:0 auto;
+    display:flex;
+    position:relative;
+    background:var(--paper);
+    box-shadow:0 30px 70px -30px rgba(6,10,25,.7), 0 4px 14px rgba(6,10,25,.25);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  /* fold line */
+  .sheet::after{
+    content:"";position:absolute;top:0;bottom:0;left:50%;width:0;
+    border-left:1px dashed rgba(120,132,166,.38);
+    transform:translateX(-.5px);pointer-events:none;z-index:40;
+  }
+  .face{width:var(--face-w);height:var(--face-h);position:relative;overflow:hidden}
+
+  /* screen scaling so an A4 fits typical widths */
+  .scaler{ }
+  @media (max-width:1180px){
+    .sheet{ transform:scale(var(--s,1)); transform-origin:top center; }
+  }
+
+  /* ============ shared type ============ */
+  .eyebrow{font-size:8.2pt;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--slate)}
+  h2,h3,h4{margin:0;line-height:1.06;letter-spacing:-.015em}
+  p{margin:0}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ============ ICON SYSTEM ============ */
+  .ic{width:1em;height:1em;display:inline-block;vertical-align:-.12em;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ic.solid{fill:currentColor;stroke:none}
+  .chip{
+    display:inline-flex;align-items:center;justify-content:center;
+    border-radius:9px;flex:none;
+  }
+
+  /* =========================================================
+     COVER (CAPA)  — right face of outer sheet
+     ========================================================= */
+  .capa{background:var(--grad-night);color:#EAF0FF;display:flex;flex-direction:column;padding:var(--pad)}
+  .capa .glow{position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(38% 26% at 20% 84%, rgba(124,58,237,.30), transparent 70%),
+      radial-gradient(40% 24% at 88% 40%, rgba(37,99,235,.28), transparent 70%);
+    z-index:0}
+  .capa > *{position:relative;z-index:1}
+
+  /* ecosystem convergence row */
+  .eco{margin-bottom:6mm}
+  .eco-top{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:3.4mm}
+  .eco-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:7.2pt;font-weight:700;letter-spacing:.02em;color:#CFE9D8;
+    background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.34);
+    padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .eco-badge .ic{font-size:11px;color:var(--wa)}
+  .eco-kicker{font-size:7pt;letter-spacing:.24em;text-transform:uppercase;color:#93A0C6;font-weight:700}
+
+  .diagram{position:relative;height:30mm;margin-top:.5mm}
+  .diagram .wires{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .channels{position:absolute;left:0;top:0;bottom:0;width:46mm;
+    display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+  .chan{display:flex;align-items:center;gap:2.6mm}
+  .chan .chip{width:9.4mm;height:9.4mm;font-size:5.4mm;background:#0E1530;border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 6px 16px -8px rgba(0,0,0,.6)}
+  .chan small{font-size:6.9pt;color:#B7C1E0;font-weight:600;letter-spacing:.01em}
+  .chan.wa .chip{color:var(--wa)}
+  .chan.ig .chip{color:#fff;background:var(--grad-ig);border-color:transparent}
+  .chan.web .chip{color:#8FB2FF}
+  .core-node{
+    position:absolute;right:0;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:3px;z-index:3}
+  .core-badge{
+    width:19mm;height:19mm;border-radius:14px;background:var(--grad-core);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:.5mm;
+    box-shadow:0 0 0 5px rgba(124,58,237,.14), 0 14px 30px -10px rgba(79,70,229,.8)}
+  .core-badge .ic{font-size:6.4mm}
+  .core-badge b{font-size:5.7pt;letter-spacing:.02em;line-height:1}
+  .core-node > small{font-size:6.4pt;color:#C6CFEA;font-weight:700;letter-spacing:.04em}
+  .core-node > small b{color:#fff}
+
+  .capa-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:5.4mm;padding:2mm 0}
+  .capa .kick{font-size:8pt;letter-spacing:.22em;text-transform:uppercase;color:#8FE3B0;font-weight:800}
+  .capa h1{font-size:26pt;line-height:.98;font-weight:800;letter-spacing:-.03em;text-wrap:balance;margin:1mm 0 0}
+  .capa h1 .g{background:var(--grad-core);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .capa .avr{font-size:15pt;font-weight:800;letter-spacing:.01em;color:#fff;margin-top:1.5mm}
+  .capa .avr i{font-style:normal;opacity:.5;font-weight:600;margin:0 2px}
+  .capa .lede{font-size:9.4pt;line-height:1.5;color:#C3CCE6;max-width:118mm}
+
+  /* phone / demo composition */
+  .demo{position:relative;height:52mm;margin-top:1mm}
+  .phone{position:absolute;left:2mm;top:0;width:44mm;height:52mm;border-radius:7mm;
+    background:#0A0F24;border:1.4mm solid #060B1C;
+    box-shadow:0 18px 40px -14px rgba(0,0,0,.75);overflow:hidden}
+  .phone .status{height:5mm;display:flex;align-items:center;gap:2mm;padding:0 3mm;background:var(--wa-deep);color:#eafff4}
+  .phone .status .ic{font-size:3.4mm}
+  .phone .status b{font-size:6.6pt}
+  .phone .status .st-r{margin-left:auto;font-size:6pt;opacity:.8}
+  .phone .thread{padding:3mm 3mm;display:flex;flex-direction:column;gap:2.4mm;background:
+    linear-gradient(#0d1836,#0d1836);height:calc(100% - 5mm)}
+  .bub{max-width:80%;font-size:6.6pt;line-height:1.32;padding:2mm 2.4mm;border-radius:3mm}
+  .bub.in{align-self:flex-start;background:#1c2748;color:#dfe6fb;border-top-left-radius:.8mm}
+  .bub.out{align-self:flex-end;background:#0f5132;background:linear-gradient(135deg,#1f9d57,#128C7E);color:#eafff2;border-top-right-radius:.8mm}
+  .bub .t{display:block;font-size:5.4pt;opacity:.6;margin-top:1mm;text-align:right}
+  .ia-tag{align-self:flex-end;display:inline-flex;align-items:center;gap:3px;font-size:5.6pt;font-weight:800;
+    color:#C7B5FF;background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.45);
+    padding:1.4mm 2mm;border-radius:999px;letter-spacing:.02em}
+  .ia-tag .ic{font-size:3mm;color:#C7B5FF}
+
+  /* floating IG notification */
+  .ig-note{position:absolute;right:1mm;top:5mm;width:56mm;display:flex;align-items:center;gap:2.4mm;
+    background:rgba(255,255,255,.96);color:#1a2138;border-radius:3.4mm;padding:2.4mm 3mm;
+    box-shadow:0 16px 34px -12px rgba(0,0,0,.55)}
+  .ig-note .chip{width:8mm;height:8mm;font-size:5mm;background:var(--grad-ig);color:#fff}
+  .ig-note .txt b{font-size:7pt;display:block}
+  .ig-note .txt small{font-size:6pt;color:#69738f}
+  /* campaign mini card */
+  .camp{position:absolute;right:1mm;bottom:0;width:56mm;background:#fff;border-radius:3.4mm;padding:2.6mm 3mm;
+    color:#1a2138;box-shadow:0 16px 34px -12px rgba(0,0,0,.5)}
+  .camp .h{display:flex;align-items:center;gap:2mm;font-size:6.6pt;font-weight:800;margin-bottom:1.6mm}
+  .camp .h .chip{width:6.4mm;height:6.4mm;font-size:4mm;background:var(--grad-core);color:#fff}
+  .camp .bar{height:2.6mm;border-radius:999px;background:#eef1f8;overflow:hidden;margin-bottom:1.4mm}
+  .camp .bar i{display:block;height:100%;width:72%;background:linear-gradient(90deg,var(--wa),#12b981)}
+  .camp .meta{display:flex;justify-content:space-between;font-size:5.8pt;color:#69738f}
+  .camp .meta b{color:#1a2138}
+
+  /* benefit strip */
+  .benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:2mm;margin-top:1mm}
+  .benefit{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:4mm;
+    padding:3mm 2.6mm;display:flex;flex-direction:column;gap:1.6mm}
+  .benefit .chip{width:8mm;height:8mm;font-size:5mm;background:rgba(255,255,255,.06)}
+  .benefit.b1 .chip{color:#C7B5FF}.benefit.b2 .chip{color:var(--wa)}.benefit.b3 .chip{color:#8FB2FF}
+  .benefit b{font-size:7.4pt;line-height:1.12;color:#fff;font-weight:800}
+
+  .capa-foot{margin-top:4mm;border-top:1px solid rgba(255,255,255,.12);padding-top:3mm;
+    display:flex;align-items:center;gap:3mm}
+  .capa-foot .arrow{width:8mm;height:8mm;border-radius:50%;background:var(--grad-core);color:#fff;
+    display:flex;align-items:center;justify-content:center;flex:none;font-size:4.4mm;
+    box-shadow:0 8px 18px -8px rgba(79,70,229,.9)}
+  .capa-foot p{font-size:8.6pt;font-weight:700;line-height:1.24;color:#EAF0FF}
+
+  /* =========================================================
+     BACK COVER (CONTRACAPA) — left face of outer sheet
+     ========================================================= */
+  .contra{background:var(--paper);color:var(--text);display:flex;flex-direction:column;padding:var(--pad)}
+  .contra .top{text-align:center;margin-bottom:5mm}
+  .contra .top .eyebrow{color:var(--core-b)}
+  .contra h2{font-size:20pt;font-weight:800;letter-spacing:-.02em;margin-top:2mm;text-wrap:balance}
+  .contra .sub{font-size:8.8pt;line-height:1.46;color:var(--slate);margin-top:2.4mm;max-width:120mm;margin-left:auto;margin-right:auto}
+
+  .qr-block{display:flex;flex-direction:column;align-items:center;gap:3mm;margin:1mm 0 4mm}
+  .qr{width:40mm;height:40mm;border-radius:4mm;background:#fff;border:1px solid var(--line);
+    padding:3mm;position:relative;box-shadow:0 12px 26px -14px rgba(20,26,46,.4)}
+  .qr svg{width:100%;height:100%;display:block}
+  .qr .branddot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:9mm;height:9mm;border-radius:2.4mm;background:var(--grad-core);display:flex;align-items:center;justify-content:center;color:#fff;
+    box-shadow:0 0 0 2mm #fff}
+  .qr .branddot .ic{font-size:5mm}
+  .qr-cta{display:inline-flex;align-items:center;gap:2mm;font-size:8.4pt;font-weight:800;color:var(--text)}
+  .qr-cta .ic{font-size:4.6mm;color:var(--core-b)}
+  .qr-note{font-size:6.6pt;color:var(--slate-2);letter-spacing:.02em}
+
+  .agents{background:var(--paper-2);border:1px solid var(--line);border-radius:5mm;padding:4mm;margin-bottom:4mm}
+  .agents h4{font-size:8pt;text-transform:uppercase;letter-spacing:.14em;color:var(--slate);margin-bottom:3mm;text-align:center}
+  .agents ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:2mm 4mm}
+  .agents li{display:flex;align-items:center;gap:2.4mm;font-size:8pt;font-weight:600}
+  .agents li .chip{width:6.6mm;height:6.6mm;font-size:4mm;background:#fff;border:1px solid var(--line);color:var(--core-b)}
+
+  .stand{background:var(--ink);color:#EAF0FF;border-radius:5mm;padding:4.4mm;margin-top:auto;position:relative;overflow:hidden}
+  .stand::before{content:"";position:absolute;right:-10mm;top:-14mm;width:40mm;height:40mm;border-radius:50%;
+    background:radial-gradient(circle,rgba(124,58,237,.5),transparent 65%)}
+  .stand > *{position:relative}
+  .stand .sh{display:flex;align-items:center;gap:2.6mm;margin-bottom:2.4mm}
+  .stand .sh .logo{display:flex;align-items:center;gap:2mm;font-weight:800;font-size:11pt;letter-spacing:-.01em}
+  .stand .sh .logo .mark{width:7mm;height:7mm;border-radius:2.2mm;background:var(--grad-core);display:flex;align-items:center;justify-content:center;color:#fff;font-size:4.4mm}
+  .stand .sh .estande{margin-left:auto;text-align:right}
+  .stand .sh .estande small{display:block;font-size:6pt;letter-spacing:.16em;text-transform:uppercase;color:#93A0C6}
+  .stand .sh .estande b{font-size:12pt;font-weight:800}
+  .stand .title{font-size:9pt;font-weight:700;line-height:1.32;color:#DBE3F7;margin-bottom:3mm}
+  .stand .rows{display:grid;grid-template-columns:1fr 1fr;gap:2mm 4mm;margin-bottom:3mm}
+  .stand .rows div{display:flex;align-items:center;gap:2mm;font-size:7.4pt;color:#C6CFEA}
+  .stand .rows .ic{font-size:3.8mm;color:#8FB2FF;flex:none}
+  .stand .talks{border-top:1px solid rgba(255,255,255,.14);padding-top:2.6mm;display:flex;align-items:center;gap:2.4mm;font-size:7.2pt;color:#CFD6EE}
+  .stand .talks b{color:#fff}
+  .stand .talks .ic{color:#8FE3B0;font-size:4mm}
+
+  /* =========================================================
+     INNER LEFT — PROBLEMAS
+     ========================================================= */
+  .inner-face{padding:var(--pad);display:flex;flex-direction:column;background:var(--paper)}
+  .prob{ }
+  .prob .head h3{font-size:15.4pt;font-weight:800;letter-spacing:-.02em;text-wrap:balance;color:var(--ink)}
+  .prob .head .eyebrow{color:#DD2A7B}
+  .prob .grid{display:grid;grid-template-columns:1fr 1fr;gap:2mm;margin-top:3mm}
+  .pcard{background:var(--paper-2);border:1px solid var(--line);border-radius:3.4mm;padding:2.4mm;display:flex;gap:2.2mm}
+  .pcard .chip{width:7mm;height:7mm;font-size:4.2mm;flex:none;background:#fff;border:1px solid var(--line);color:#DD2A7B}
+  .pcard b{font-size:7.6pt;display:block;color:var(--text);line-height:1.08}
+  .pcard span{font-size:6.6pt;color:var(--slate);line-height:1.28;display:block;margin-top:.8mm}
+
+  .transition{display:flex;align-items:center;gap:2.6mm;margin:2.6mm 0 2.6mm;
+    background:linear-gradient(135deg,rgba(124,58,237,.10),rgba(37,99,235,.08));
+    border:1px solid rgba(79,70,229,.22);border-radius:3.6mm;padding:2.8mm 3mm}
+  .transition .chip{width:7mm;height:7mm;font-size:4.4mm;flex:none;background:var(--grad-core);color:#fff}
+  .transition p{font-size:8pt;font-weight:700;line-height:1.24;color:var(--ink)}
+
+  .conv{background:var(--ink);border-radius:4mm;padding:3mm;color:#EAF0FF}
+  .conv .top{display:flex;align-items:center;gap:2mm;margin-bottom:2.6mm}
+  .conv .top .chip{width:6.4mm;height:6.4mm;font-size:4mm;background:var(--wa-deep);color:#fff}
+  .conv .top b{font-size:7pt}
+  .conv .top .clock{margin-left:auto;font-size:6.2pt;color:#93A0C6;display:flex;align-items:center;gap:1.4mm}
+  .conv .top .clock .ic{font-size:3.2mm}
+  .conv .thread{display:flex;flex-direction:column;gap:2mm}
+  .conv .bub{max-width:88%;font-size:6.8pt;line-height:1.34;padding:2mm 2.6mm;border-radius:3mm}
+  .conv .bub.in{align-self:flex-start;background:#1c2748;color:#e2e8fb;border-top-left-radius:.8mm}
+  .conv .bub.out{align-self:flex-end;background:linear-gradient(135deg,#1f9d57,#128C7E);color:#eafff2;border-top-right-radius:.8mm}
+  .conv .bub .t{display:block;font-size:5.4pt;opacity:.6;margin-top:.8mm;text-align:right}
+  .conv .cap{margin-top:2.6mm;font-size:6.8pt;color:#AEB9DA;font-style:italic;text-align:center}
+
+  /* =========================================================
+     INNER RIGHT — SOLUÇÕES
+     ========================================================= */
+  .sol .head .eyebrow{color:var(--core-b)}
+  .sol .head h3{font-size:14.4pt;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-wrap:balance}
+  .sol .head .sub{font-size:7.8pt;line-height:1.4;color:var(--slate);margin-top:2mm}
+  .pillars{display:flex;flex-direction:column;gap:2.6mm;margin-top:4mm}
+  .pillar{border:1px solid var(--line);border-radius:4mm;padding:3mm 3.2mm;position:relative;overflow:hidden;background:#fff}
+  .pillar .ph{display:flex;align-items:center;gap:2.6mm;margin-bottom:2mm}
+  .pillar .chip{width:9mm;height:9mm;font-size:5.4mm;color:#fff;flex:none}
+  .pillar .ph b{font-size:11pt;font-weight:800;letter-spacing:.02em}
+  .pillar .ph .kx{margin-left:auto;font-size:6.4pt;color:var(--slate-2);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .pillar ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:1mm 3mm}
+  .pillar li{font-size:6.9pt;line-height:1.24;color:var(--text);display:flex;gap:1.6mm;align-items:flex-start}
+  .pillar li::before{content:"";width:1.4mm;height:1.4mm;border-radius:50%;flex:none;margin-top:1.5mm;background:currentColor;opacity:.5}
+  .pillar.atender{border-color:rgba(37,99,235,.28)} .pillar.atender .chip{background:linear-gradient(135deg,#2563EB,#22D3EE)} .pillar.atender .ph b{color:#1d4ed8} .pillar.atender li{color:#25324e}
+  .pillar.vender{border-color:rgba(37,211,102,.30)} .pillar.vender .chip{background:linear-gradient(135deg,#16a34a,#25D366)} .pillar.vender .ph b{color:#0f7a3a} .pillar.vender li{color:#22402f}
+  .pillar.reter{border-color:rgba(124,58,237,.28)} .pillar.reter .chip{background:var(--grad-core)} .pillar.reter .ph b{color:#6d28d9} .pillar.reter li{color:#332b4d}
+
+  /* =========================================================
+     DISPAROS band — crosses the fold along the bottom
+     ========================================================= */
+  .inner-top{display:flex;height:148mm}
+  .inner-top .inner-face{width:var(--face-w);height:100%}
+  .disparos{position:absolute;left:0;right:0;bottom:0;height:62mm;
+    background:var(--ink);color:#EAF0FF;padding:4.4mm var(--pad);display:flex;flex-direction:column;z-index:5;overflow:hidden}
+  .disparos::before{content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(50% 90% at 12% 120%, rgba(37,211,102,.22), transparent 60%),
+      radial-gradient(50% 90% at 60% -30%, rgba(124,58,237,.28), transparent 60%);}
+  .disparos > *{position:relative}
+  .disp-head{display:flex;align-items:flex-end;gap:5mm;margin-bottom:2.6mm}
+  .disp-head .tt .eyebrow{color:#8FE3B0}
+  .disp-head .tt h3{font-size:15pt;font-weight:800;letter-spacing:-.01em;margin-top:1.4mm;color:#fff}
+  .disp-head .tt h3 em{font-style:normal;color:#8FE3B0}
+  .disp-head .tt .sub{font-size:7.6pt;color:#C3CCE6;line-height:1.36;margin-top:1.4mm;max-width:150mm}
+  .disp-punch{margin-left:auto;text-align:right;flex:none;align-self:center}
+  .disp-punch b{font-size:12.5pt;font-weight:800;line-height:1.12;letter-spacing:-.01em;display:block}
+  .disp-punch b i{font-style:normal;background:var(--grad-core);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .disp-punch b .g2{color:var(--wa)}
+
+  .disp-body{display:grid;grid-template-columns:1.2fr 1.2fr 1fr 1.28fr;gap:3.4mm;align-items:stretch;flex:1}
+  .steps{display:contents}
+  .step{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:3.4mm;padding:2.8mm;display:flex;flex-direction:column;gap:1.4mm;justify-content:center}
+  .step .n{width:6mm;height:6mm;border-radius:50%;background:var(--grad-core);color:#fff;display:flex;align-items:center;justify-content:center;font-size:7.4pt;font-weight:800}
+  .step b{font-size:7.6pt;color:#fff;line-height:1.1}
+  .step span{font-size:6.4pt;color:#AEB9DA;line-height:1.3}
+
+  .mini-screens{display:flex;flex-direction:column;gap:1.8mm;justify-content:center}
+  .mini{background:#fff;border-radius:2.6mm;padding:1.8mm 2.2mm;color:#1a2138;box-shadow:0 8px 18px -10px rgba(0,0,0,.5)}
+  .mini .mh{display:flex;align-items:center;gap:1.6mm;font-size:6pt;font-weight:800;margin-bottom:1.4mm}
+  .mini .mh .chip{width:4.6mm;height:4.6mm;font-size:2.8mm;color:#fff}
+  .mini.camp2 .mh .chip{background:var(--grad-core)} .mini.resp .mh .chip{background:var(--wa)}
+  .mini .mh .tag{margin-left:auto;font-size:5pt;font-weight:800;padding:.6mm 1.6mm;border-radius:999px}
+  .mini.camp2 .tag{background:#eaf0ff;color:#2563EB}.mini.resp .tag{background:#e7f9ef;color:#0f7a3a}
+  .mini .line{display:flex;justify-content:space-between;font-size:5.6pt;color:#69738f;margin-bottom:1mm}
+  .mini .line b{color:#1a2138}
+  .mini .bar{height:1.8mm;border-radius:999px;background:#eef1f8;overflow:hidden}
+  .mini .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--core-a),var(--core-c));width:64%}
+  .mini .mb{font-size:5.6pt;line-height:1.24;padding:1.4mm 1.8mm;border-radius:2mm;margin-top:.4mm}
+  .mini .mb.in{background:#f0f2f8;color:#333c58}
+  .mini .mb.ia{background:#eef7f1;color:#1c6b3f;border:1px solid #cfead9}
+  .mini .mb.ia b{color:#0f7a3a}
+
+  /* ===== responsive scale ===== */
+  @media (max-width:1180px){ :root{ } .sheet{ } }
+
+  /* =========================================================
+     PRINT — real A4 landscape imposition
+     ========================================================= */
+  @media print{
+    @page{size:A4 landscape;margin:0}
+    body{background:#fff;padding:0}
+    .doc-head,.sheet-label,.print-hide{display:none!important}
+    .doc{max-width:none;margin:0}
+    .sheet-wrap{margin:0}
+    .sheet{box-shadow:none;border-radius:0;margin:0;page-break-after:always;transform:none!important}
+    .sheet::after{border-color:rgba(150,160,190,.5)}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== shared SVG icon sprite ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-wa" viewBox="0 0 24 24"><path class="solid" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.4A10 10 0 1 0 12 2Zm5.4 13.9c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .3-3.4-.7-2.9-1.2-4.7-4.2-4.9-4.4-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4-.1.7.5.2.6.8 2 .9 2.1.1.1.1.3 0 .5-.1.2-.2.4-.3.5l-.4.5c-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1.3.1 1.8.9 2.1 1 .3.2.5.2.6.4.1.1.1.6-.1 1.2Z"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.2"/><circle cx="12" cy="12" r="4.1"/><circle class="solid" cx="17.2" cy="6.8" r="1.15" stroke="none"/></symbol>
+    <symbol id="i-meta" viewBox="0 0 24 24"><path d="M3 15c0-4 2-8 4.4-8 3.2 0 4.1 10 7.2 10 1.9 0 2.9-2.5 2.9-5s-1-5-2.9-5c-1.7 0-3 1.8-4.1 4"/></symbol>
+    <symbol id="i-web" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.5 7.2L4 20.5l1.3-4.4A8 8 0 1 1 20 12Z"/><path d="M9 11h6M9 14h4"/></symbol>
+    <symbol id="i-ai" viewBox="0 0 24 24"><path class="solid" d="m12 2 1.9 5.6L19.5 9l-4.8 1.7L12 16l-2.7-5.3L4.5 9l5.6-1.4L12 2Z"/><path class="solid" d="m19 15 .9 2.6L22.5 19l-2.6.9L19 22.5l-.9-2.6L15.5 19l2.6-.4L19 15Z"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.2 2.9 7.9 7 9 4.1-1.1 7-4.8 7-9V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-headset" viewBox="0 0 24 24"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="12.5" width="4" height="6" rx="1.4"/><rect x="17" y="12.5" width="4" height="6" rx="1.4"/><path d="M20 18.5v.5a3 3 0 0 1-3 3h-3"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.6 12.4 11 5h6.5A2.5 2.5 0 0 1 20 7.5V14l-7.4 7.4a1.6 1.6 0 0 1-2.3 0l-6.7-6.7a1.6 1.6 0 0 1 0-2.3Z"/><circle class="solid" cx="15.5" cy="8.5" r="1.3" stroke="none"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="i-ghost" viewBox="0 0 24 24"><path d="M8.5 10a3.5 3.5 0 1 1 5.2 3c-1 .6-1.7 1.2-1.7 2.4"/><path d="M12 19h.01"/><circle cx="12" cy="12" r="9" stroke-dasharray="3 3"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5Z"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M4 19a5 5 0 0 1 10 0"/><path d="M16 6.5a3 3 0 0 1 0 5"/><path d="M17 14a5 5 0 0 1 3 5"/></symbol>
+    <symbol id="i-heartpulse" viewBox="0 0 24 24"><path d="M12 20S4 15 4 9.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5c0 1.2-.4 2.3-1 3.3"/><path d="M13 12.5h3l1.5-2 1.5 4 1-2H23"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.4"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.2"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7Z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15 14.6A4.6 4.6 0 0 1 21 19"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle class="solid" cx="12" cy="12" r="1.4" stroke="none"/></symbol>
+    <symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l6 4V6L6 10H4a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7 7 0 0 1 0 11"/></symbol>
+  </defs>
+</svg>
+
+<div class="doc">
+  <div class="doc-head print-hide">
+    <h1>ChatFusion — Folder A4 (dobrado ao meio · 4 faces A5)</h1>
+    <p>Mockup pronto para revisão e impressão. Fluxo de leitura: <b>Capa → Problemas → Soluções → Teste agora</b>. Para gerar o PDF final, use <b>Imprimir → Salvar como PDF</b> (A4, paisagem, margens “Nenhuma”, gráficos de fundo ativados). A faixa de <b>Disparos em massa</b> atravessa a dobra na base das faces internas, conforme o briefing.</p>
+  </div>
+
+  <!-- ============ SHEET 1 · OUTER: Contracapa | Capa ============ -->
+  <div class="sheet-wrap">
+    <div class="sheet-label">Folha externa <span>· verso da folha impressa</span></div>
+    <div class="sheet">
+      <!-- CONTRACAPA (left) -->
+      <section class="face contra">
+        <div class="top">
+          <div class="eyebrow">Experimentação e conversão</div>
+          <h2>Não imagine.<br>Teste agora.</h2>
+          <p class="sub">Converse com agentes de Inteligência Artificial criados para situações reais de academias, estúdios e boxes.</p>
+        </div>
+
+        <div class="qr-block">
+          <div class="qr">
+            <!-- QR estilizado (placeholder) — substituir pelo QR real de produção -->
+            <svg viewBox="0 0 100 100" aria-label="QR Code (placeholder)">
+              <rect width="100" height="100" fill="#fff"/>
+              <g fill="#0B1020">
+                <!-- finder patterns -->
+                <path d="M4 4h24v24H4z"/><rect x="9" y="9" width="14" height="14" fill="#fff"/><rect x="12" y="12" width="8" height="8" fill="#0B1020"/>
+                <path d="M72 4h24v24H72z"/><rect x="77" y="9" width="14" height="14" fill="#fff"/><rect x="80" y="12" width="8" height="8" fill="#0B1020"/>
+                <path d="M4 72h24v24H4z"/><rect x="9" y="77" width="14" height="14" fill="#fff"/><rect x="12" y="80" width="8" height="8" fill="#0B1020"/>
+                <!-- pseudo-random modules -->
+                <path d="M34 6h4v4h-4zM42 6h4v4h-4zM54 6h4v4h-4zM62 6h4v4h-4zM34 14h4v4h-4zM50 14h4v4h-4zM58 14h4v4h-4zM38 22h4v4h-4zM46 22h4v4h-4zM62 22h4v4h-4z"/>
+                <path d="M6 34h4v4H6zM14 34h4v4h-4zM22 34h4v4h-4zM6 42h4v4H6zM18 42h4v4h-4zM6 54h4v4H6zM14 62h4v4h-4zM22 54h4v4h-4z"/>
+                <path d="M34 34h4v4h-4zM42 38h4v4h-4zM50 34h4v4h-4zM58 42h4v4h-4zM34 42h4v4h-4zM66 34h4v4h-4zM34 50h4v4h-4zM42 54h4v4h-4zM58 50h4v4h-4zM66 58h4v4h-4zM50 58h4v4h-4zM34 62h4v4h-4z"/>
+                <path d="M74 34h4v4h-4zM82 38h4v4h-4zM90 34h4v4h-4zM74 46h4v4h-4zM86 46h4v4h-4zM90 54h4v4h-4zM74 58h4v4h-4zM82 62h4v4h-4z"/>
+                <path d="M34 74h4v4h-4zM42 78h4v4h-4zM50 74h4v4h-4zM58 82h4v4h-4zM66 74h4v4h-4zM74 74h4v4h-4zM82 78h4v4h-4zM90 74h4v4h-4zM50 90h4v4h-4zM66 90h4v4h-4zM82 90h4v4h-4zM34 86h4v4h-4z"/>
+              </g>
+            </svg>
+            <div class="branddot"><svg class="ic solid"><use href="#i-ai"/></svg></div>
+          </div>
+          <div class="qr-cta"><svg class="ic"><use href="#i-target"/></svg> Aponte a câmera e escolha um agente para testar.</div>
+          <div class="qr-note print-hide">↑ QR ilustrativo — inserir o QR real do link de teste na arte final.</div>
+        </div>
+
+        <div class="agents">
+          <h4>Escolha um agente e comece</h4>
+          <ul>
+            <li><span class="chip"><svg class="ic"><use href="#i-headset"/></svg></span> IA para atendimento</li>
+            <li><span class="chip"><svg class="ic"><use href="#i-tag"/></svg></span> IA para vendas</li>
+            <li><span class="chip"><svg class="ic"><use href="#i-target"/></svg></span> IA para recuperar leads</li>
+            <li><span class="chip"><svg class="ic"><use href="#i-heartpulse"/></svg></span> IA para alunos ausentes</li>
+            <li><span class="chip"><svg class="ic"><use href="#i-refresh"/></svg></span> IA para renovação</li>
+            <li><span class="chip"><svg class="ic"><use href="#i-users"/></svg></span> IA para ex-alunos</li>
+          </ul>
+        </div>
+
+        <div class="stand">
+          <div class="sh">
+            <div class="logo"><span class="mark"><svg class="ic solid"><use href="#i-ai"/></svg></span> ChatFusion</div>
+            <div class="estande"><small>Estande</small><b>#B-42</b></div>
+          </div>
+          <p class="title">Visite o estande ChatFusion — veja agentes funcionando ao vivo, participe das mini palestras e descubra por onde começar na sua academia.</p>
+          <div class="rows">
+            <div><svg class="ic"><use href="#i-wa"/></svg> WhatsApp (11) 9 0000-0000</div>
+            <div><svg class="ic"><use href="#i-ig"/></svg> @chatfusion.ia</div>
+            <div><svg class="ic"><use href="#i-globe"/></svg> chatfusion.com.br</div>
+            <div><svg class="ic"><use href="#i-cam"/></svg> Demonstrações ao vivo</div>
+          </div>
+          <div class="talks"><svg class="ic"><use href="#i-clock"/></svg> <span><b>Mini palestras:</b> 11h · 14h · 17h — todos os dias do evento.</span></div>
+        </div>
+      </section>
+
+      <!-- CAPA (right) -->
+      <section class="face capa">
+        <div class="glow"></div>
+
+        <!-- ecossistema -->
+        <div class="eco">
+          <div class="eco-top">
+            <span class="eco-kicker">Tudo conectado ao ChatFusion</span>
+            <span class="eco-badge"><svg class="ic solid"><use href="#i-shield"/></svg> Conectado à API oficial do WhatsApp</span>
+          </div>
+          <div class="diagram">
+            <svg class="wires" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="wire" x1="0" x2="1"><stop offset="0" stop-color="#31406e"/><stop offset="1" stop-color="#7C3AED"/></linearGradient>
+              </defs>
+              <path d="M96 15 C 175 15, 175 50, 244 50" fill="none" stroke="url(#wire)" stroke-width="1.6"/>
+              <path d="M96 50 H 244" fill="none" stroke="url(#wire)" stroke-width="1.6"/>
+              <path d="M96 85 C 175 85, 175 50, 244 50" fill="none" stroke="url(#wire)" stroke-width="1.6"/>
+              <circle cx="96" cy="15" r="2.6" fill="#7C3AED"/><circle cx="96" cy="50" r="2.6" fill="#7C3AED"/><circle cx="96" cy="85" r="2.6" fill="#7C3AED"/>
+            </svg>
+            <div class="channels">
+              <div class="chan ig"><span class="chip"><svg class="ic"><use href="#i-ig"/></svg></span><small>Instagram</small></div>
+              <div class="chan wa"><span class="chip"><svg class="ic solid"><use href="#i-wa"/></svg></span><small>WhatsApp</small></div>
+              <div class="chan web"><span class="chip"><svg class="ic"><use href="#i-web"/></svg></span><small>Webchat</small></div>
+            </div>
+            <div class="core-node">
+              <div class="core-badge"><svg class="ic solid"><use href="#i-ai"/></svg><b>ChatFusion</b></div>
+              <small><b>IA</b> · núcleo</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- headline -->
+        <div class="capa-body">
+          <div>
+            <div class="kick">Plataforma de IA para academias</div>
+            <h1>Inteligência Artificial para <span class="g">todas as academias</span></h1>
+            <div class="avr">Atender.<i>·</i>Vender.<i>·</i>Reter.</div>
+          </div>
+          <p class="lede">Coloque Inteligência Artificial no WhatsApp, Instagram e atendimento digital da sua academia.</p>
+
+          <!-- demo composition -->
+          <div class="demo">
+            <div class="phone">
+              <div class="status"><svg class="ic solid"><use href="#i-wa"/></svg><b>Academia · IA</b><span class="st-r">online</span></div>
+              <div class="thread">
+                <div class="bub in">Olá, gostaria de saber o valor e os horários.<span class="t">23:14</span></div>
+                <div class="bub out">Olá! Claro, vou te ajudar. Procura musculação, aulas ou alguma modalidade específica?<span class="t">23:14</span></div>
+                <div class="ia-tag"><svg class="ic solid"><use href="#i-ai"/></svg> Respondido pela IA</div>
+              </div>
+            </div>
+            <div class="ig-note">
+              <span class="chip"><svg class="ic"><use href="#i-ig"/></svg></span>
+              <div class="txt"><b>Instagram Direct</b><small>“Ainda dá pra começar essa semana?”</small></div>
+            </div>
+            <div class="camp">
+              <div class="h"><span class="chip"><svg class="ic"><use href="#i-mega"/></svg></span> Campanha · Reativação</div>
+              <div class="bar"><i></i></div>
+              <div class="meta"><span><b>1.842</b> contatos</span><span>Respostas <b>+312</b></span></div>
+            </div>
+          </div>
+
+          <!-- benefits -->
+          <div class="benefits">
+            <div class="benefit b1"><span class="chip"><svg class="ic"><use href="#i-ai"/></svg></span><b>Atendimento com IA</b></div>
+            <div class="benefit b2"><span class="chip"><svg class="ic"><use href="#i-mega"/></svg></span><b>Disparos em massa sem bloqueios</b></div>
+            <div class="benefit b3"><span class="chip"><svg class="ic"><use href="#i-web"/></svg></span><b>WhatsApp e Instagram integrados</b></div>
+          </div>
+        </div>
+
+        <!-- open CTA -->
+        <div class="capa-foot">
+          <span class="arrow"><svg class="ic"><use href="#i-arrow"/></svg></span>
+          <p>Abra e descubra quantas oportunidades sua academia pode estar perdendo.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============ SHEET 2 · INNER: Problemas | Soluções (+ Disparos) ============ -->
+  <div class="sheet-wrap">
+    <div class="sheet-label">Folha interna <span>· frente da folha impressa</span></div>
+    <div class="sheet">
+      <div class="inner-top">
+        <!-- PROBLEMAS (left) -->
+        <section class="inner-face prob">
+          <div class="head">
+            <div class="eyebrow">Isso acontece com você?</div>
+            <h3>Quantas oportunidades sua academia perde todos os dias?</h3>
+          </div>
+          <div class="grid">
+            <div class="pcard"><span class="chip"><svg class="ic"><use href="#i-clock"/></svg></span><div><b>Demora para responder</b><span>O lead chama, espera e procura outra academia.</span></div></div>
+            <div class="pcard"><span class="chip"><svg class="ic"><use href="#i-ghost"/></svg></span><div><b>Leads esquecidos</b><span>Pede informação, mas ninguém continua a conversa.</span></div></div>
+            <div class="pcard"><span class="chip"><svg class="ic"><use href="#i-moon"/></svg></span><div><b>Mensagens fora do horário</b><span>A academia fecha, mas os interessados continuam chamando.</span></div></div>
+            <div class="pcard"><span class="chip"><svg class="ic"><use href="#i-team"/></svg></span><div><b>Equipe sobrecarregada</b><span>As mesmas perguntas, várias vezes por dia.</span></div></div>
+            <div class="pcard"><span class="chip"><svg class="ic"><use href="#i-heartpulse"/></svg></span><div><b>Alunos sem acompanhamento</b><span>O aluno para de frequentar e ninguém o procura.</span></div></div>
+            <div class="pcard"><span class="chip"><svg class="ic"><use href="#i-db"/></svg></span><div><b>Base de contatos parada</b><span>Milhares de leads e ex-alunos sem novas campanhas.</span></div></div>
+          </div>
+
+          <div class="transition"><span class="chip"><svg class="ic solid"><use href="#i-ai"/></svg></span><p>A Inteligência Artificial pode trabalhar esses problemas todos os dias.</p></div>
+
+          <div class="conv">
+            <div class="top"><span class="chip"><svg class="ic solid"><use href="#i-wa"/></svg></span><b>Cliente novo</b><span class="clock"><svg class="ic"><use href="#i-clock"/></svg> 23:14</span></div>
+            <div class="thread">
+              <div class="bub in">Olá, gostaria de saber o valor e os horários.<span class="t">23:14</span></div>
+              <div class="bub out">Olá! Claro, vou te ajudar. Está procurando musculação, aulas ou alguma modalidade específica?<span class="t">23:14</span></div>
+            </div>
+            <p class="cap">Enquanto sua academia está fechada, a conversa continua.</p>
+          </div>
+        </section>
+
+        <!-- SOLUÇÕES (right) -->
+        <section class="inner-face sol">
+          <div class="head">
+            <div class="eyebrow">A solução</div>
+            <h3>O ChatFusion coloca sua academia para trabalhar com Inteligência Artificial.</h3>
+            <p class="sub">No WhatsApp, Instagram e canais digitais, a IA atende clientes, trabalha oportunidades e ajuda sua equipe.</p>
+          </div>
+
+          <div class="pillars">
+            <div class="pillar atender">
+              <div class="ph"><span class="chip"><svg class="ic"><use href="#i-headset"/></svg></span><b>ATENDER</b><span class="kx">24 horas</span></div>
+              <ul>
+                <li>Responde imediatamente</li>
+                <li>Atende fora do horário</li>
+                <li>Explica planos, horários e modalidades</li>
+                <li>Transfere para a equipe quando necessário</li>
+              </ul>
+            </div>
+            <div class="pillar vender">
+              <div class="ph"><span class="chip"><svg class="ic"><use href="#i-tag"/></svg></span><b>VENDER</b><span class="kx">Converte</span></div>
+              <ul>
+                <li>Atende novos interessados</li>
+                <li>Apresenta planos</li>
+                <li>Responde dúvidas e objeções</li>
+                <li>Retoma leads esquecidos</li>
+                <li>Agenda visitas e aulas experimentais</li>
+              </ul>
+            </div>
+            <div class="pillar reter">
+              <div class="ph"><span class="chip"><svg class="ic"><use href="#i-refresh"/></svg></span><b>RETER</b><span class="kx">Fideliza</span></div>
+              <ul>
+                <li>Acompanha novos alunos</li>
+                <li>Trabalha alunos ausentes</li>
+                <li>Ajuda nas renovações</li>
+                <li>Recupera cancelamentos</li>
+                <li>Reativa ex-alunos</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- DISPAROS band across the fold -->
+      <div class="disparos">
+        <div class="disp-head">
+          <div class="tt">
+            <div class="eyebrow">O segundo grande motor de vendas</div>
+            <h3>DISPAROS EM MASSA <em>SEM BLOQUEIOS</em></h3>
+            <p class="sub">Envie campanhas para leads, alunos e ex-alunos sem comprometer o WhatsApp principal da sua academia. Ative sua base. Gere conversas. Venda mais.</p>
+          </div>
+          <div class="disp-punch"><b>Você <i>dispara</i>.<br>A IA <span class="g2">conversa</span>.<br>Sua equipe vende.</b></div>
+        </div>
+
+        <div class="disp-body">
+          <div class="step"><span class="n">1</span><b>Escolha quem recebe</b><span>Leads, alunos, ausentes, inadimplentes ou ex-alunos.</span></div>
+          <div class="step"><span class="n">2</span><b>Envie sua campanha</b><span>Promoções, convites, novidades, renovações ou recuperação.</span></div>
+          <div class="step"><span class="n">3</span><b>Deixe a IA conversar</b><span>A IA responde, identifica o interesse e encaminha as oportunidades.</span></div>
+
+          <div class="mini-screens">
+            <div class="mini camp2">
+              <div class="mh"><span class="chip"><svg class="ic"><use href="#i-send"/></svg></span> Campanha <span class="tag">Enviando</span></div>
+              <div class="line"><span>Público: ex-alunos</span><b>1.842</b></div>
+              <div class="bar"><i></i></div>
+            </div>
+            <div class="mini resp">
+              <div class="mh"><span class="chip"><svg class="ic solid"><use href="#i-wa"/></svg></span> Respostas <span class="tag">Oportunidade</span></div>
+              <div class="mb in">“Quero voltar a treinar 💪”</div>
+              <div class="mb ia"><b>IA:</b> Que ótimo! Já garanto sua condição especial de retorno…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Fit each A4 sheet to the viewport width on smaller screens.
+  function fit(){
+    var wrap = document.querySelector('.doc');
+    if(!wrap) return;
+    var avail = wrap.clientWidth;
+    // A4 landscape width in px at 96dpi ≈ 296mm * 3.7795
+    var sheetPx = 296 * 3.7795275591;
+    var s = Math.min(1, avail / sheetPx);
+    document.querySelectorAll('.sheet').forEach(function(el){
+      el.style.setProperty('--s', s);
+      if(s < 1){
+        el.style.transform = 'scale('+s+')';
+        el.style.transformOrigin = 'top center';
+        el.style.marginBottom = (- (1-s) * 210 * 3.7795275591) + 'px';
+      } else {
+        el.style.transform = '';
+        el.style.marginBottom = '';
+      }
+    });
+  }
+  window.addEventListener('resize', fit);
+  window.addEventListener('DOMContentLoaded', fit);
+  fit();
+</script>
+</body>
+</html>
